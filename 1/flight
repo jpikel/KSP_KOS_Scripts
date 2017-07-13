@@ -1,0 +1,17 @@
+Set SHIP:CONTROL:MAINTHROTTLE to 0.
+
+Set Kp to 0.01.
+Set Ki to 0.006.
+Set Kd to 0.006.
+
+LOCAL pitchPID is PIDLOOP(Kp, Ki, Kd).
+Set PID:SETPOINT to 5.
+
+Set thrott to 1.
+Lock THROTTLE to thrott.
+
+until false {
+    set SHIP:CONTROL:PITCH to pitchPID:UPDATE(TIME:SECONDS, SHIP:FACING:PITCH).
+    wait 0.1.
+}
+
