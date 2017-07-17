@@ -56,7 +56,7 @@ declare function asparagus {
 
     //calculate pitch
     lock result to 90 * (1 - (altitude / turnend)^turnexponent). 
-    lock targetpitch to max(1, result).
+    lock targetpitch to max(2, result).
 
     //initial launch
     clearscreen.
@@ -76,6 +76,7 @@ declare function asparagus {
         print "target pitch: " + round(targetpitch) + "  " at (0,2).
         set old_maxthrust to asparagus(old_maxthrust, thrott).
         set thrott to dthrott.
+        wait 0.2.
     }
 
     until apoapsis > tgt_ap {

@@ -12,7 +12,7 @@ clearscreen.
 local tgt_hd to 90.
 local time1 to ((target:orbit:lan - ship:body:rotationangle) + abs(ship:longitude)) / 360 * ship:body:rotationperiod.
 local time2 to (180 - (ship:body:rotationangle + ship:longitude) + target:orbit:lan) / 360 * ship:body:rotationperiod.
-local offset to 60. //seconds before AN or DN
+local offset to 30. //seconds before AN or DN
 local waittime to 0.
 local t0 to 0.
 local t1 to 0.
@@ -21,15 +21,15 @@ print time2.
 if(time1 > 0 and time1 < time2) {
     set waittime to time:seconds - offset + time1.
     warpto(time:seconds - offset + time1). 
-    set tgt_hd to tgt_hd - target:orbit:inclination - 0.25.
+    set tgt_hd to tgt_hd - target:orbit:inclination.
 } else if time2 > 0{ //DN is closer warp there!
     set waittime to time:seconds - offset + time2.
     warpto(time:seconds - offset + time2).
-    set tgt_hd to tgt_hd + target:orbit:inclination + 0.25.
+    set tgt_hd to tgt_hd + target:orbit:inclination.
 } else {
     set waittime to time:seconds - offset + (-1*time1).
     warpto(time:seconds - offset + (-1*time1)).
-    set tgt_hd to tgt_hd - target:orbit:inclination - 0.25.
+    set tgt_hd to tgt_hd - target:orbit:inclination.
 }
 
 //terminal:input:clear().

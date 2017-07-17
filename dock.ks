@@ -19,9 +19,9 @@ declare function dock {
     wait until vang(ship:facing:vector, lookdirup(target:facing:vector*-1, ship:facing:topvector):vector) < 2.
     
 
-    local kp1 to 1.
-    local ki1 to 0.025.
-    local kd1 to 3.5.
+    local kp1 to 0.1.
+    local ki1 to 0.00001.
+    local kd1 to 5.
 
     local kp2 to kp1.
     local ki2 to ki1.
@@ -32,21 +32,23 @@ declare function dock {
     local kd3 to kd1.
 
     local x_pid to PIDLoop(kp1, ki1, kd1, -1, 1).
-    set x_pid:setpoint to 0.
-
     local y_pid to pidloop(kp2, ki2, kd2, -1, 1).
-    set y_pid:setpoint to 0.
+    set x_pid:setpoint to get_x_diff(myPort).
+    set y_pid:setpoint to get_y_diff(myPort).
 
     local d_pid to pidloop(kp3, ki3, kd3, -1, 1).
-    set d_pid:setpoint to 15.
+    set d_pid:setpoint to get_z_diff(myPort).
 
     local done to false.
     local docking to false.
+    local readytodock to false.
 
     local currTime to time:seconds.
     local currDist to target:ship:distance.
     local relv to 0.
     local t0 to time:seconds.
+
+    terminal:input:clear().
 
     until done {
         if time:seconds - currTime > 1 {
@@ -69,21 +71,50 @@ declare function dock {
 
         set ship:control:starboard to x_pid:update(time:seconds, get_x_diff(myPort)).
         set ship:control:top to -1*y_pid:update(time:seconds, get_y_diff(myPort)).
-        set ship:control:fore to -1*d_pid:update(time:seconds, get_z_diff(myPort)).
-
-        if docking = true and time:seconds-t0 > 7 {
-            set d_pid:setpoint to max(target:acquirerange, d_pid:setpoint - 1).
-            set t0 to time:seconds.
+        if docking = false  {
+            set ship:control:fore to -1*d_pid:update(time:seconds, get_z_diff(myPort)).
+        } else if docking = true {
+            set ship:control:fore to d_pid:update(time:seconds, relv).
         }
 
-        if docking = false and abs(get_x_diff(myPort)) < 0.05 and abs(get_y_diff(myPort)) < 0.05 and  time:seconds-t0 > 7 {
+        if terminal:input:haschar(){ 
+            local ch to terminal:input:getchar().
+            terminal:input:clear().
+            if ch = "g" {
+                set readytodock to true.
+            }
+        }
+
+        if time:seconds - t0 > 2 {
+            set d_pid:setpoint to max(10, d_pid:setpoint - 1).
+            set y_pid:setpoint to max(0, y_pid:setpoint - 1).
+            set x_pid:setpoint to max(0, x_pid:setpoint - 1).
+        }
+
+        if docking = false 
+            and readytodock = true
+            and abs(get_x_diff(myPort)) < 0.075 
+            and abs(get_y_diff(myPort)) < 0.075 
+            and  time:seconds-t0 > 10 {
             set docking to true.
-            print "docking..." at (0,9).
-        } else if docking = false and relv > 0.05 {
+            print "docking..." at (0,10).
+            d_pid:reset().
+            x_pid:reset().
+            y_pid:reset().
+            set d_pid:setpoint to 0.5.
+            set d_pid:maxoutput to 0.2.
+            set d_pid:minoutput to -0.2.
+            set d_pid:kd to 1.5.
+            set x_pid:kd to 1.2.
+            set y_pid:kd to 1.2.
+            set x_pid:ki to 0.
+            set y_pid:ki to 0.
+
+        } else if docking = false and abs(relv) > 0.05 {
             set t0 to time:seconds.
         }
 
-        if docking = true and abs(get_z_diff(myPort)) < target:acquirerange + 3 {
+        if docking = true and abs(get_z_diff(myPort)) < target:acquirerange + 0.25 {
             set done to true.
         }
 

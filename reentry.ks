@@ -58,11 +58,10 @@ SAS off.
     wait until vang(ship:facing:vector, lookdirup(vcrs(ship:body:position, ship:velocity:orbit),ship:body:position):vector) < 5.
     stage.
     lock steering to srfretrograde + R(0,0,adjustRoll).
-    local waitparam to 20000.
-    until ship:altitude < 20000 and x = 0 {
+    until ship:altitude < 20000 {
         from {local x is 0.} until x = 359 step {set x to x + 1.} do {
             set adjustRoll to adjustRoll + 1.
-            wait waitparam/ship:altitude + 0.0001.
+            wait 0.05.
         }
     }
     lock steering to srfretrograde.
