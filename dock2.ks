@@ -142,19 +142,34 @@ declare function main {
     Print "Facing the target".
     local lock steering to lookdirup(thatPort:portfacing:vector*-1, north:vector) + R(0,0,roll).
     wait until vang(ship:facing:forevector, thatPort:portfacing:vector*-1) < 0.5.
-    //moveToTop(35,4,hostPort, thatPort).
+    moveToTop(10,0.5,hostPort, thatPort).
+    wait 0.1.
+    moveToTop(8,0.5,hostPort, thatPort).
+    wait 0.1.
+    moveToTop(6,0.5,hostPort, thatPort).
+    wait 0.1.
+    moveToTop(4,0.4,hostPort, thatPort).
+
 //    moveTopFront(50,2,hostPort, thatPort).
-    approach(40,1, hostPort, thatPort).
-    approach(30,1, hostPort, thatPort).
-    approach(20,0.8, hostPort, thatPort).
-    approach(10,0.4, hostPort, thatPort).
-    approach(8,0.4, hostPort, thatPort).
-    approach(6,0.4, hostPort, thatPort).
-    approach(4,0.4, hostPort, thatPort).
-    approach(4,0.4, hostPort, thatPort).
-    approach(2,0.3, hostPort, thatPort).
-    approach(2,0.3, hostPort, thatPort).
-    approach(0,0.3, hostPort, thatPort).
+    //approach(40,1, hostPort, thatPort).
+//    approach(30,1, hostPort, thatPort).
+  //  approach(20,0.8, hostPort, thatPort).
+    //approach(10,0.4, hostPort, thatPort).
+//    approach(8,0.4, hostPort, thatPort).
+  // approach(6,0.4, hostPort, thatPort).
+    approach(2,0.4, hostPort, thatPort).
+    wait 0.1.
+    approach(2,0.4, hostPort, thatPort).
+    wait 0.1.
+    approach(1, 0.3, hostPort, thatPort).
+    wait 0.1.
+    approach(1, 0.3, hostPort, thatPort).
+    wait 0.1.
+    approach(0.5,0.2, hostPort, thatPort).
+    wait 0.1.
+    approach(0.5,0.2, hostPort, thatPort).
+    wait 0.1.
+    approach(0,0.2, hostPort, thatPort).
     translate(V(0,0,0)).
     set ship:control:mainthrottle to 0.
     set ship:control:neutralize to True.

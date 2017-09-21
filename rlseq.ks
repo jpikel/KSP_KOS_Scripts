@@ -3,7 +3,7 @@
 // defaults to 75km and due east.
 // dependencies: rocket_launch.ks, circ_at.ks, exenode.ks
 
-PARAMETER Ap IS 72500.
+PARAMETER Ap IS 80000.
 PARAMETER tgt_hd IS 90.
 SET t0 TO TIME:SECONDS.
 RUNoncePATH("0:/rocket_launch", Ap, tgt_hd).

@@ -38,7 +38,7 @@ declare function process_one {
 }
 
 
-declare parameter seekAlt is 5.
+declare parameter seekAlt is 3.
 set ship:control:pilotmainthrottle to 0.
 SAS ON.
 //Stage.
@@ -50,8 +50,8 @@ declare global done to true.
 local lock queue to ship:messages.
 
 local Kp to 0.106.
-local Ki to 0.090.
-local Kd to 0.090.
+local Ki to 0.050.
+local Kd to 0.50.
 
 local hoverPID to PIDLoop(Kp, Ki, Kd, -0.1, 0.25).
 
