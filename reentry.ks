@@ -1,23 +1,26 @@
 //Filename: reentry.ks
-//Description: kill horizontal velocity while maintaining as close to periapsis as possible.
 
 @lazyglobal off.
 SAS off.
 
     clearscreen.
-    run lib_physics.ks.
-
-    local reverse to false.
-    //wait until just before PE
-
-//    print "Testing pitch".
-//    lock steering to ship:retrograde + R(0, 20, 0).
-//    wait 30.
-//    if (90 - vang(up:vector, ship:facing:forevector) < ship:retrograde:pitch){
-//        set reverse to true.
-//        Print "reverse!".
-//    }
-//    unlock steering.
+    if ship:altitude > 2500000 {
+        set warp to 5.
+        wait until ship:altitude < 2500000.
+    }
+    if ship:altitude > 600000 {
+        set warp to 4.
+        wait until ship:altitude < 600000.
+    }
+    if ship:altitude > 300000 {
+        set warp to 3.
+        wait until ship:altitude < 300000.
+    }
+    set warp to 2.
+    wait until ship:altitude < 100000.
+    set warp to 1.
+    wait until ship:altitude < 79000.
+    set warp to 0.
 
     local Kp to 0.005.
     local Ki to 0.05.
@@ -30,40 +33,40 @@ SAS off.
     local lock idealPitch to ship:retrograde:vector + R(0,adjustPitch,0).
     lock steering to idealPitch.
     local lock curPitch to 90 - vang(up:vector, ship:facing:forevector).
-    wait until ship:altitude < 72000.
+    wait until ship:altitude < 73000.
     panels off.
     runoncepath("0:/antenna", "retract").
     wait until ship:altitude < 70500.
     set pitchpid:setpoint to ship:periapsis.
     terminal:input:clear().
-    wait until terminal:input:haschar() or ship:altitude < 67500.
+    wait until terminal:input:haschar() or ship:altitude < 69500.
     lock throttle to 1.
-    until velocity:surface:mag < 2300 or ship:maxthrust = 0 or ship:altitude < 59000 {
+    until velocity:surface:mag < 2300 or ship:altitude < 58000 {
         print "cur pitch: " + round(curPitch) at (0,5).
         print "adjustpitch:" + round(adjustPitch) at (0,7).
         if(abs(90 - vang((ship:retrograde:vector + R(0,adjustPitch, 0)), up:vector)) - 30 < 30){
                 set adjustPitch to adjustPitch - pitchPid:update(time:seconds, ship:periapsis).
-//           if ( reverse = true){
-//                set adjustPitch to adjustPitch - pitchPid:update(time:seconds, ship:periapsis).
-//            } else {
-//                set adjustPitch to adjustPitch + pitchPid:update(time:seconds, ship:periapsis).
-//            }
         } 
 
     }
     lock throttle to 0.
     unlock throttle.
     set ship:control:pilotmainthrottle to 0.
-    lock steering to lookdirup(vcrs(Ship:body:position,ship:velocity:orbit),ship:body:position).
-    wait until vang(ship:facing:vector, lookdirup(vcrs(ship:body:position, ship:velocity:orbit),ship:body:position):vector) < 5.
+    lock steering to north + R(0,45,0).
+    wait 3.
+    stage.
+    wait until stage:ready.
     stage.
     lock steering to srfretrograde + R(0,0,adjustRoll).
+    wait 5.
     until ship:altitude < 20000 {
         from {local x is 0.} until x = 359 step {set x to x + 1.} do {
             set adjustRoll to adjustRoll + 1.
             wait 0.05.
         }
+    //    if ship:altitude < 50000 set warp to 2.
     }
     lock steering to srfretrograde.
-    wait 5.
+    wait until ship:altitude < 3000.
     unlock steering.
+    set warp to 0.

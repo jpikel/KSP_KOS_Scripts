@@ -95,23 +95,23 @@ declare function run_node {
     local tset to 0.
     local dv0 to nd:deltav.
     local done to false.
-    local old_availablethrust to ship:availablethrust.
+    local old_availablethrust to ship:maxthrust.
     lock throttle to tset.
 
     until done {
         print "burn commencing" at (0,5).
       //  update_ts().
-        if(old_availablethrust > ship:availablethrust){
+        if(old_availablethrust > ship:maxthrust){
             local temp_tset to tset.
             set tset to 0.
             stage.
             wait 0.25.
             set tset to temp_tset.
-            set old_availablethrust to ship:availablethrust.
+            set old_availablethrust to ship:maxthrust.
         } else {
             set max_acc to ship:availablethrust / ship:mass.
             set tset to min(nd:deltav:mag/(max_acc + 0.01), 1). //remove +0.01
-            set old_availablethrust to ship:availablethrust.
+            set old_availablethrust to ship:maxthrust.
         }
         if vdot(dv0, nd:deltav) < 0 {
             print "burn complete" at (0,6).

@@ -5,10 +5,10 @@
 // pitchangle = 90 * (1 - (currentAltitude / turnEnd)^turnExponent)
 
 @LAZYGLOBAL OFF.
-parameter tgt_ap is 72500.
+parameter tgt_ap is 75000.
 parameter tgt_hd is 90.
 declare global targettwr to 2.00.
-declare global turnend to 40000.
+declare global turnend to 42500.
 declare global turnexponent to 0.5.
 declare global thrott to 1.
 

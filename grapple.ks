@@ -1,127 +1,90 @@
-// Filename: dock.ks
-// Description: a docking script that I am working on and needs way 
-// more work...
+// Filename: grapple.ks
+// Description: 
 
 
 @lazyglobal off.
 
-declare function dock {
+main().
+
+declare function printDist {
+    parameter dist.
+    parameter relv.
+    print "Dist: " + round(dist, 2) + "        " at (0,5).
+    print "Relv: " + round(relv:mag, 3) + "       " at (0,6).
+}
+    
+declare function translate {
+    parameter vector.
+    if vector:mag > 1 set vector to vector:normalized.
+
+    set ship:control:fore to vector * ship:facing:forevector.
+    set ship:control:starboard to vector * ship:facing:starvector.
+    set ship:control:top to vector * ship:facing:topvector.
+}
+
+declare function cancelRelv {
+    Print "Cancelling relative velocity to taget".
+    lock steering to target:velocity:orbit - ship:velocity:orbit.
+    wait until vang(target:velocity:orbit, ship:velocity:orbit) < 1.
+    local lock relv to target:velocity:orbit - ship:velocity:orbit.
+    until false {
+        local lastDiff to (target:velocity:orbit - ship:velocity:orbit):mag.
+        set ship:control:mainthrottle to min(1,relv:mag).
+        print "Relv: " + round(relv:mag, 3) + "       " at (0,6).
+        if relv:mag > lastDiff {
+            unlock steering.
+            set ship:control:mainthrottle to 0.
+            break.
+        }
+    }
+    unlock steering.
+}
+
+
+declare function approach {
+    parameter offset.
+    parameter speed.
+    parameter grabber.
+
+    local lock targetVector to target:position - grabber:position.
+    local lock relv to ship:velocity:orbit - target:velocity:orbit.
+    until false or targetVector:mag < offset {
+        if hastarget {
+            translate((targetVector:normalized*speed) - relv).
+            printDist(targetVector:mag, relv).
+        } else {
+            break.
+        }
+    }
+}
+
+declare function main {
     sas off.
     rcs on.
     clearscreen.
-
-    lock st to lookdirup(target:position,-north:vector).
-    lock steering to st.
-    wait until vang(ship:facing:vector, target:position) < 2.
-    
-
-    local kp1 to 1.
-    local ki1 to 0.005.
-    local kd1 to 8.
-
-    local kp2 to kp1.
-    local ki2 to ki1.
-    local kd2 to kd1.
-
-    local kp3 to kp1.
-    local ki3 to ki1.
-    local kd3 to kd1.
-
-    local x_pid to PIDLoop(kp1, ki1, kd1, -1, 1).
-    local y_pid to pidloop(kp2, ki2, kd2, -1, 1).
-    set x_pid:setpoint to 0.
-    set y_pid:setpoint to 0.
-
-    local d_pid to pidloop(kp3, ki3, kd3, -1, 1).
-    set d_pid:setpoint to 15.
-
-    local done to false.
-    local docking to false.
-    local readytodock to false.
-
-    local currTime to time:seconds.
-    local currDist to target:distance.
-    local relv to 0.
-    local t0 to time:seconds.
-
-    terminal:input:clear().
-
-    until done {
-        if time:seconds - currTime > 1 {
-            set relv to get_relv(currTime, currDist).
-            set currTime to time:seconds.
-            set currDist to (ship:position - target:position):mag.
-        
-        }
-
-        print "relv: " + round(relv, 4) + "      " at (0,0).
-        print "Dist: " + round(currDist, 4) + "      " at (0,1).
-        print "xdif: " + round(get_x_diff(),4) + "      " at (0,2).
-        print "ydif: " + round(get_y_diff(),4) + "      " at (0,3).
-        print "zdif: " + round(get_z_diff(),4) + "      " at (0,4).
-        print "xout: " + round(x_pid:output,4) + "      " at (0,5).
-        print "yout: " + round(y_pid:output,4) + "      " at (0,6).
-        print "zout: " + round(d_pid:output,4) + "      " at (0,7).
-        print "dset: " + round(d_pid:setpoint, 4) + "        " at(0,8).
-        print "xset: " + round(x_pid:setpoint, 4) + "        " at (0,9).
-        print "yset: " + round(y_pid:setpoint, 4) + "        " at (0,10).
-        print "Elapsed: " + round(time:seconds - t0, 4) + "         " at (0,11).
-        print "kd1: " + round(kd1, 4) + "      " at (0,13).
-
-        set ship:control:starboard to x_pid:update(time:seconds, get_x_diff()).
-        set ship:control:top to y_pid:update(time:seconds, get_y_diff()).
-//        if docking = false  {
-//        set ship:control:fore to -1*d_pid:update(time:seconds, get_z_diff()).
-//        } else if docking = true {
-        //set ship:control:fore to d_pid:update(time:seconds, relv).
-//        }
-
-        if currDist < 15 {
-            set d_pid:setpoint to 0.5.
-        }
-
-        if docking = false and abs(relv) > 0.05 {
-            set t0 to time:seconds.
-        }
-
-        if currDist < 2 {
-            set done to true.
-        }
+    local grab to ship:partsdubbed("GrapplingDevice").
+    local grabber to grab[0].
+    local roll to 0.
+    //cancelRelv().
+    on AG10 {
+        set roll to roll + 15.
+        if roll > 365 set roll to 0.
+        preserve.
     }
 
+    Print "Facing the target".
+    local lock steering to lookdirup(target:position, north:vector) + R(0,0,roll).
+    wait until vang(ship:facing:forevector, target:position) < 2.
+    approach(50,5, grabber).
+    approach(15,2, grabber).
+    approach(3,0.6, grabber).
+    print "Drifting to grapple".
+    lock steering to target:position.
+    translate(V(0,0,0)).
     set ship:control:mainthrottle to 0.
-    unlock steering.
     set ship:control:neutralize to True.
+    wait 3.
+    unlock steering.
     SAS on.
     RCS off.
 }
-
-
-declare function get_x_diff {
-    return VDOT(ship:position - target:position, target:facing:starvector).
-//    return ship:facing:starvector:normalized * target:position.
-}
-
-declare function get_y_diff {
-//    return VDOT(ship:position - target:position, target:facing:topvector).
-    return ship:facing:topvector:normalized * target:position.
-}
-
-declare function get_z_diff {
-//    return VDOT(ship:position - target:position, target:facing:forevector).
-    return ship:facing:forevector:normalized * target:position.
-}
-
-declare function get_dir {
-    return lookdirup(ship:facing:topvector, target:facing:forevector).
-    
-}
-
-declare function get_relv {
-    parameter oldTime.
-    parameter oldDist.
-//    return (oldDist - (ship:position - target:position):mag) /abs((oldTime - time:seconds)).
-    return (target:velocity:orbit - ship:velocity:orbit):mag.
-}
-
-dock().

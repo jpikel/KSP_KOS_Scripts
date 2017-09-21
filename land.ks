@@ -57,6 +57,6 @@ until nd:orbit:periapsis <  nd_terrain_height {
         if error = false { set done to true. }
     }
 
-    runoncepath("0:/exenode.ks").
+    //runoncepath("0:/exenode.ks").
 
     //runoncepath("0:/slam.ks").
