@@ -62,7 +62,7 @@ declare function run_node {
     local nd to nextnode.
     local max_acc to ship:availablethrust/ship:mass.
     local lock burn_duration to calc_time(nd).
-
+    local time_div to 1.9.
 
     local waitTime to 3.
     until waitTime < 0 {
@@ -72,10 +72,10 @@ declare function run_node {
     }
     clearscreen.
     //warp to current time + node eta - estimated burn time - 30 seconds padding.
-    if(time:seconds < time:seconds + nd:eta - burn_duration/2 -50){
+    if(time:seconds < time:seconds + nd:eta - burn_duration/time_div -50){
         print "Warping to node." at (0,4).
-        local warpedTime to (time:seconds + nd:eta - burn_duration/2 -50).
-        warpto(time:seconds + nd:eta - burn_duration/2 - 50).
+        local warpedTime to (time:seconds + nd:eta - burn_duration/time_div -50).
+        warpto(time:seconds + nd:eta - burn_duration/time_div - 50).
         until time:seconds > warpedTime and warp = 0 and ship:unpacked {
             print_data(nd, burn_duration).
         }
@@ -87,31 +87,31 @@ declare function run_node {
     until vang(nd:burnvector, ship:facing:forevector) < 3 {
         print_data(nd, burn_duration).
     }
-    warpto(time:seconds + nd:eta - burn_duration/2 - 10).
-    until nd:eta <= (burn_duration/2){
+    warpto(time:seconds + nd:eta - burn_duration/time_div - 10).
+    until nd:eta <= (burn_duration/time_div){
         print_data(nd, burn_duration).
     }
 
     local tset to 0.
     local dv0 to nd:deltav.
     local done to false.
-    local old_availablethrust to ship:availablethrust.
+    local old_availablethrust to ship:maxthrust.
     lock throttle to tset.
 
     until done {
         print "burn commencing" at (0,5).
       //  update_ts().
-        if(old_availablethrust > ship:availablethrust){
+        if(old_availablethrust > ship:maxthrust){
             local temp_tset to tset.
             set tset to 0.
             stage.
             wait 0.25.
             set tset to temp_tset.
-            set old_availablethrust to ship:availablethrust.
+            set old_availablethrust to ship:maxthrust.
         } else {
             set max_acc to ship:availablethrust / ship:mass.
-            set tset to min(nd:deltav:mag/(max_acc + 0.01), 1). //remove +0.01
-            set old_availablethrust to ship:availablethrust.
+            set tset to max(min(nd:deltav:mag/max_acc, 1),0.005). //remove +0.01
+            set old_availablethrust to ship:maxthrust.
         }
         if vdot(dv0, nd:deltav) < 0 {
             print "burn complete" at (0,6).
@@ -123,9 +123,9 @@ declare function run_node {
             sas on.
         }
 
-        if nd:deltav:mag < 0.05 {   //changed from 0.1
+        if nd:deltav:mag < 0.04 {   //changed from 0.1
             print "finalizing" at (0,6).
-            wait until vdot(dv0, nd:deltav) < 0.025. //changed from 0.5
+            wait until vdot(dv0, nd:deltav) < 0.01. //changed from 0.5
             lock throttle to 0.
             print "burn complete" at (0,7).
             set done to true.

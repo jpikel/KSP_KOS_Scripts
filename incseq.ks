@@ -6,7 +6,7 @@
 // Dependencies: rocket_launch.ks, circ_at.ks, exenode.ks
 @lazyglobal off.
 //Inclined rocket Launch Sequence
-PARAMETER Ap IS 72500.
+PARAMETER Ap IS 80000.
 
 clearscreen.
 local tgt_hd to 90.

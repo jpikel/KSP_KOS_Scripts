@@ -1,12 +1,15 @@
 
 
 @lazyglobal off.
-
+parameter turnOff to true.
 //allowed parameters are retract and extend otherwise defaults to toggle
 
     local rcsBlock TO SHIP:PARTSDUBBED("RCSBlock").
 
-
+    local x to 0.
+    if turnOff = false {
+        set x to 1.
+    }
     local rcsBlocks to List(). 
     for block in rcsBlock {
         rcsBlocks:add(block).
@@ -19,8 +22,8 @@
             block:getmodule("modulercsfx"):doevent("show actuation toggles").
         }
         if block:getmodule("modulercsfx"):hasfield("yaw"){
-            block:getmodule("modulercsfx"):setfield("yaw", 0).
-            block:getmodule("modulercsfx"):setfield("pitch", 0).
-            block:getmodule("modulercsfx"):setfield("roll", 0).
+            block:getmodule("modulercsfx"):setfield("yaw", x).
+            block:getmodule("modulercsfx"):setfield("pitch", x).
+            block:getmodule("modulercsfx"):setfield("roll", x).
         }
     }

@@ -39,7 +39,7 @@ lock time2 to impacttime.
 lock idealthrottle to time1/time2.                  // hoverslam throttling setting
 lock shipHeightAboveTerrain to ship:altitude - abs(ship_bottom) - abs(ship:geoposition:terrainheight).
 
-until ship:status = "landed" OR shipHeightAboveTerrain < 1 {
+until ship:status = "landed" OR shipHeightAboveTerrain < 2 {
     printdata(time1, time2, shipHeightAboveTerrain).
     if(time1 > time2) {
         print "burn has begun!" at (0,2).

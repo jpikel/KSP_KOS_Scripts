@@ -39,7 +39,7 @@ SAS off.
     lock vel to velocity:surface:mag.
 
     terminal:input:clear().
-    until eta:periapsis < round(vel/maxdecel)  or terminal:input:haschar{
+    until terminal:input:haschar{
         print "decel time: " + round(vel/maxdecel) at (0,4).
         print "eta pe: " + round(eta:periapsis) + "      " at (0,5).
     }

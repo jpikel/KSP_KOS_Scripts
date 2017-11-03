@@ -6,8 +6,6 @@
 @LAZYGLOBAL OFF.
 PARAMETER tgt_Ap IS 75000.
 PARAMETER tgt_hd IS 90.
-DECLARE GLOBAL turnEnd TO 50000.
-DECLARE GLOBAL turnExponent TO 0.5.
 CLEARSCREEN.
 
     SET SHIP:CONTROL:PILOTMAINTHROTTLE TO 0. //set throttle to 0
@@ -22,18 +20,9 @@ CLEARSCREEN.
     //calculate current pitch above horizon.
     LOCK cur_pitch TO 90 - VANG(UP:VECTOR, SHIP:FACING:FOREVECTOR).
 
-    //PID loop set up
-    LOCAL Kp TO 0.06.
-    LOCAL Ki TO 0.25.
-    LOCAL Kd TO 0.1.
-    
-    LOCAL PID TO PIDLOOP(Kp, Ki, Kd).
-    SET PID:SETPOINT TO 5. //initial set point of 5 degrees pitch.
-        
-    GLOBAL ship_Pi TO 0.25.
-    LOCAL ship_Hd TO 90.45.
+    local ship_Pi TO 0.25.
+    LOCAL ship_Hd TO 90.
     LOCK THROTTLE TO 1.0.
-    LOCK WHEELSTEERING TO ship_Hd.
     LOCK STEERING TO HEADING (ship_Hd, ship_Pi).
     WAIT 2.
     STAGE.
@@ -44,7 +33,7 @@ CLEARSCREEN.
     PRINT "Target Ap: " + tgt_Ap AT (0,1).
 
     WAIT UNTIL SHIP:AIRSPEED > 100.
-    SET ship_Pi TO 1.
+    SET ship_Pi TO 2.
     PRINT "Pitch to " + ship_Pi + "          " AT (9,0).
     
     WAIT UNTIL SHIP:STATUS = "FLYING".
@@ -52,35 +41,35 @@ CLEARSCREEN.
     UNLOCK WHEELSTEERING.
     GEAR OFF.
     SET ship_Hd TO tgt_hd.
-    SET PID:SETPOINT TO 5.
     UNTIL SHIP:ALTITUDE > 200 {
-        SET ship_Pi TO PID:UPDATE(TIME:SECONDS, cur_pitch).
-        WAIT 0.1.
+        if ship_Pi < 10 {
+            SET ship_Pi to ship_Pi + 1.
+        }
+        WAIT 1.
     }
     PRINT "Pitch TO 20      " AT (9,0).
-    SET PID:SETPOINT TO 20.
     UNTIL RapierThrust < 180 {
-        SET ship_Pi TO PID:UPDATE(TIME:SECONDS, cur_pitch).
-        WAIT 0.01.
+        if ship_Pi < 20 {
+            SET ship_Pi to ship_Pi + 1.
+        }
+
+        WAIT 1.
     }
-    
+
+    UNTIL SHIP:ALTITUDE > 20000 {
+        if ship_Pi < 30 {
+            SET ship_Pi to ship_Pi + 1.
+        }
+        WAIT 1.
+    }
     AG1 ON.
     PRINT "Switching Rapiers" AT (0,2).
-
-    UNTIL SHIP:ALTITUDE > 24000 {
-        SET ship_Pi TO PID:UPDATE(TIME:SECONDS, cur_pitch).
-        WAIT 0.01.
-    }
+    wait UNTIL SHIP:ALTITUDE > 25000.
     AG2 ON.
-    PRINT "Jet engines shutdown" AT (0,3).
-    
-    WAIT UNTIL cur_pitch > targetPitch.
-    
-    UNTIL APOAPSIS > tgt_Ap {
-        SET ship_Pi TO targetPitch.
-        WAIT 0.01.
-    }
+    print "Shutting down jet engines".
 
+    WAIT UNTIL ship:apoapsis > tgt_ap + 500.
+    
     LOCK THROTTLE TO 0.
     LOCK STEERING TO SHIP:PROGRADE.
     PRINT "Coasting TO space  " AT (9,0).
