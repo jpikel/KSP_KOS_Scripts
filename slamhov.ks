@@ -40,7 +40,7 @@ lock time2 to impacttime.
 lock idealthrottle to (time1+0.05)/time2.                  // hoverslam throttling setting
 lock shipHeightAboveTerrain to ship:altitude - abs(ship_bottom) - abs(ship:geoposition:terrainheight).
 
-until ship:status = "landed" OR shipHeightAboveTerrain < 2 {
+until ship:status = "landed" OR shipHeightAboveTerrain < 10 {
     printdata(time1, time2, shipHeightAboveTerrain).
     if(time1 > time2) {
         print "burn has begun!" at (0,2).
@@ -50,12 +50,9 @@ until ship:status = "landed" OR shipHeightAboveTerrain < 2 {
         lock steering to up + r(0,0,-90).
     }
 }
-print "landed!".
-lock throttle to 0.
-unlock throttle.
-set ship:control:pilotmainthrottle to 0.
+print "hovering!".
 unlock steering.
-sas on.
+runoncepath("0:/hover.ks", 10).
 
 print "mass0: " + round(mass0,2) at (0,10).
 print "mass1: " + round(ship:mass, 2) at (0,11).

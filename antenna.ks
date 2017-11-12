@@ -1,47 +1,36 @@
 
 
-@lazyglobal off.
-
 //allowed parameters are retract and extend otherwise defaults to toggle
 
 parameter dowhat to "toggle".
 
-    local c16 TO SHIP:PARTSDUBBED("Communotron 16").
-    local cm1 TO SHIP:PARTSDUBBED("Comms DTS-M1").
-    local c88 TO SHIP:PARTSDUBBED("Communotron 88-88").
-    local cm2 to Ship:partsdubbed("Communotron DTS-M1").
-    local hg to ship:partsdubbed("HighGainAntenna5").
-    local antennae TO LIST().
-    for antenna in c16 {
-            antennae:add(antenna).
-    }
-    for antenna in cm1 {
-            antennae:add(antenna).
-    }
-    for antenna in c88 {
-            antennae:add(antenna).
-    }
-    for antenna in cm2 {
-            antennae:add(antenna).
-    }
-    for antenna in hg {
-        antennae:add(antenna).
-    }
-    for antenna in antennae {
-        if dowhat = "toggle" {
-            if (antenna:getmodule("moduledeployableantenna"):hasevent("extend antenna")){
-                antenna:getmodule("moduledeployableantenna"):doevent("extend antenna").
-            } else {
-                antenna:getmodule("moduledeployableantenna"):doevent("retract antenna").
-            }
-        } else if dowhat = "extend" {
-            if (antenna:getmodule("moduledeployableantenna"):hasevent("extend antenna")){
-                antenna:getmodule("moduledeployableantenna"):doevent("extend antenna").
-            }
-        } else if dowhat = "retract" {
-            if (antenna:getmodule("moduledeployableantenna"):hasevent("retract antenna")){
-                antenna:getmodule("moduledeployableantenna"):doevent("retract antenna").
-            }
 
+for p in ship:parts {
+    if p:modules:contains("ModuleDeployableAntenna"){
+        local m is p:getmodule("ModuleDeployableAntenna").
+
+        if dowhat = "extend" { 
+            extend(m). 
+        }
+        else if dowhat = "retract" {
+            retract(m).
+        }
+        
+        if dowhat ="toggle" and m:hasevent("extend antenna"){ 
+            extend(m).
+        }
+        else { 
+            retract(m). 
         }
     }
+}
+
+declare function extend {
+    parameter m.
+    if m:hasevent("extend antenna"){ m:doevent("extend antenna").}
+}
+
+declare function retract {
+    parameter m.
+    if m:hasevent("extend antenna"){ m:doevent("retract antenna").}
+}

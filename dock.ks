@@ -4,8 +4,8 @@
 
 @lazyglobal off.
 
-main().
-
+parameter localport is "a".
+main(localport).
 
 declare function printDist {
     parameter dist.
@@ -27,24 +27,6 @@ declare function draw {
     parameter vector.
     clearvecdraws().
     vecdraw(V(0,0,0), vector, RGB(0,0,1), "Move here", 1, true, 0.2).
-}
-
-declare function cancelRelv {
-    Print "Cancelling relative velocity to taget".
-    lock steering to target:ship:velocity:orbit - ship:velocity:orbit.
-    wait until vang(target:ship:velocity:orbit, ship:velocity:orbit) < 5.
-    local lock relv to target:ship:velocity:orbit - ship:velocity:orbit.
-    until false {
-        local lastDiff to (target:ship:velocity:orbit - ship:velocity:orbit):mag.
-        set ship:control:mainthrottle to min(1,relv:mag).
-        print "Relv: " + round(relv:mag, 3) + "       " at (0,6).
-        if relv:mag > lastDiff {
-            unlock steering.
-            set ship:control:mainthrottle to 0.
-            break.
-        }
-    }
-    unlock steering.
 }
 
 declare function moveTopFront {
@@ -108,7 +90,7 @@ declare function approach {
         local distVector to (thatPort:position - hostPort:position).
         printDist(targetVector:mag, relv).
         draw(targetVector).
-        if vang(hostPort:portfacing:vector, distVector) < 2 and abs(offset - distVector:mag) < 0.1{
+        if vang(hostPort:portfacing:vector, distVector)<2 and abs(offset-distVector:mag) < 0.1{
             translate(V(0,0,0)).
             break.
         }
@@ -116,50 +98,49 @@ declare function approach {
 }
 
 declare function main {
+    parameter localport is "a".
     sas off.
     rcs on.
     clearscreen.
 
-    local ports to ship:partsdubbed("thisPort").
-    if ports:length = 0 {
-        set ports to ship:partsdubbed("dockingPort1").
-        if ports:length = 0 {
-            set ports to ship:partsdubbed("dockingPort2").
+    local ports to ship:partsdubbed(localport).
+    if ports:length > 0 {
+        local hostPort to ports[0].
+        hostPort:controlfrom().
+        local thatPort to target.
+        local r to 0.
+        on AG9 {
+            set r to r - 7.5.
+            if r < 0 set r to 365.
+            preserve.
         }
-    }
-    local hostPort to ports[0].
-    hostPort:controlfrom().
 
-    local thatPort to 0.
-    set thatPort to target.
-    local roll to 0.
-    //cancelRelv().
-    on AG10 {
-        set roll to roll + 15.
-        if roll > 365 set roll to 0.
-        preserve.
+        on AG10 {
+            set r to r + 7.5.
+            if r > 365 set r to 0.
+            preserve.
+        }
+        Print "Facing the target".
+        lock steering to lookdirup(thatPort:portfacing:vector*-1, north:vector)+R(0,0,r).
+        wait until vang(ship:facing:forevector, thatPort:portfacing:vector*-1) < 2.
+        approach(10,1.5, hostPort, thatPort).
+        approach(10,1, hostPort, thatPort).
+        approach(8,1, hostPort, thatPort).
+        approach(8,0.8, hostPort, thatPort).
+        approach(6,0.8, hostPort, thatPort).
+        approach(6,0.7, hostPort, thatPort).
+        approach(4,0.6, hostPort, thatPort).
+        approach(4,0.5, hostPort, thatPort).
+        approach(2,0.3, hostPort, thatPort).
+        approach(2,0.3, hostPort, thatPort).
+        approach(0,0.3, hostPort, thatPort).
+        translate(V(0,0,0)).
+        set ship:control:mainthrottle to 0.
+        set ship:control:neutralize to True.
+        unlock steering.
+        SAS on.
+        RCS off.
+        clearvecdraws().
+
     }
-    Print "Facing the target".
-    local lock steering to lookdirup(thatPort:portfacing:vector*-1, north:vector) + R(0,0,roll).
-    wait until vang(ship:facing:forevector, thatPort:portfacing:vector*-1) < 0.5.
-    //moveToTop(35,4,hostPort, thatPort).
-//    moveTopFront(50,2,hostPort, thatPort).
-    approach(40,1, hostPort, thatPort).
-    approach(30,1, hostPort, thatPort).
-    approach(20,0.8, hostPort, thatPort).
-    approach(10,0.4, hostPort, thatPort).
-    approach(8,0.4, hostPort, thatPort).
-    approach(6,0.4, hostPort, thatPort).
-    approach(4,0.4, hostPort, thatPort).
-    approach(4,0.4, hostPort, thatPort).
-    approach(2,0.3, hostPort, thatPort).
-    approach(2,0.3, hostPort, thatPort).
-    approach(0,0.3, hostPort, thatPort).
-    translate(V(0,0,0)).
-    set ship:control:mainthrottle to 0.
-    set ship:control:neutralize to True.
-    unlock steering.
-    SAS on.
-    RCS off.
-    clearvecdraws().
 }

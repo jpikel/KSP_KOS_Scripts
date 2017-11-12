@@ -24,10 +24,10 @@ SAS off.
 
 
     local Kp to 0.05.
-    local Ki to 0.2.
-    local Kd to 0.8.
+    local Ki to 0.03.
+    local Kd to 0.08.
     local slow to 0.
-    local pitchPid to pidloop(Kp, Ki, Kd, -.01, .01).
+    local pitchPid to pidloop(Kp, Ki, Kd, -1, 1).
     set pitchpid:setpoint to 0.
 
     local adjustPitch to 0.
@@ -49,9 +49,9 @@ SAS off.
             lock throttle to 1.
             set slow to ship:verticalspeed/10.
             if ( reverse = true){
-                set adjustPitch to adjustPitch - pitchPid:update(time:seconds, slow).
+                set adjustPitch to pitchPid:update(time:seconds, slow).
             } else {
-                set adjustPitch to adjustPitch + pitchPid:update(time:seconds, slow).
+                set adjustPitch to pitchPid:update(time:seconds, slow).
             }
         }
     }
