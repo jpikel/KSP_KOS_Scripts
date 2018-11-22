@@ -8,7 +8,7 @@
 parameter tgt_ap is 75000.
 parameter tgt_hd is 90.
 declare global targettwr to 2.00.
-declare global turnend to 50000.
+declare global turnend to 55000.
 declare global turnexponent to 0.525.
 declare global thrott to 1.
 

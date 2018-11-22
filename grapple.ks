@@ -22,50 +22,13 @@ declare function translate {
     set ship:control:top to vector * ship:facing:topvector.
 }
 
-declare function cancelRelv {
-    Print "Cancelling relative velocity to taget".
-    lock steering to target:velocity:orbit - ship:velocity:orbit.
-    wait until vang(target:velocity:orbit, ship:velocity:orbit) < 1.
-    local lock relv to target:velocity:orbit - ship:velocity:orbit.
-    until false {
-        local lastDiff to (target:velocity:orbit - ship:velocity:orbit):mag.
-        set ship:control:mainthrottle to min(1,relv:mag).
-        print "Relv: " + round(relv:mag, 3) + "       " at (0,6).
-        if relv:mag > lastDiff {
-            unlock steering.
-            set ship:control:mainthrottle to 0.
-            break.
-        }
-    }
-    unlock steering.
-}
-
-
-declare function approach {
-    parameter offset.
-    parameter speed.
-    parameter grabber.
-
-    local lock targetVector to target:position - grabber:position.
-    local lock relv to ship:velocity:orbit - target:velocity:orbit.
-    until false or targetVector:mag < offset {
-        if hastarget {
-            translate((targetVector:normalized*speed) - relv).
-            printDist(targetVector:mag, relv).
-        } else {
-            break.
-        }
-    }
-}
-
 declare function main {
     sas off.
     rcs on.
     clearscreen.
-    local grab to ship:partsdubbed("GrapplingDevice").
+    local grab to SHIP:partsdubbed("GrapplingDevice").
     local grabber to grab[0].
     local roll to 0.
-    //cancelRelv().
     on AG10 {
         set roll to roll + 15.
         if roll > 365 set roll to 0.
@@ -88,3 +51,23 @@ declare function main {
     SAS on.
     RCS off.
 }
+
+declare function approach {
+    parameter offset.
+    parameter speed.
+    parameter grabber.
+
+    local lock targetVector to target:position - grabber:position.
+    local lock relv to ship:velocity:orbit - target:velocity:orbit.
+    until false or targetVector:mag < offset {
+        if hastarget {
+            translate((targetVector:normalized*speed) - relv).
+            printDist(targetVector:mag, relv).
+        } else {
+            translate(V(0,0,0)).
+            break.
+        }
+    }
+}
+
+
