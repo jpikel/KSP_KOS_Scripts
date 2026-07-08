@@ -18,52 +18,15 @@ run fc.
 flowchart TD
     Start(["run fc."]) --> Status{"ship:status"}
 
-    Status -->|"PRELAUNCH, or LANDED at Kerbin"| Launch["Launch menu"]
-    Status -->|"LANDED / SPLASHED elsewhere"| Surface["Surface menu"]
-    Status -->|"ORBITING / ESCAPING / SUB_ORBITAL"| Space["Space menu"]
-    Status -->|"FLYING (in atmosphere)"| Air["Air menu"]
+    Status -->|"PRELAUNCH /<br/>LANDED at Kerbin"| Launch["<b>Launch</b><br/>rlseq.ks (quick/prompted)<br/>ssto.ks (quick/prompted)<br/>launchwindow.ks<br/>plane_launch.ks<br/>science.ks"]
+    Status -->|"LANDED / SPLASHED<br/>elsewhere"| Surface["<b>Surface</b><br/>hop.ks<br/>science.ks<br/>rlseq.ks<br/>launchwindow.ks<br/>basedock.ks<br/>rove.ks<br/>hover.ks"]
+    Status -->|"ORBITING / ESCAPING /<br/>SUB_ORBITAL"| Space["<b>Space</b>"]
+    Status -->|"FLYING<br/>(in atmosphere)"| Air["<b>Air</b><br/>planeland.ks<br/>plane_launch.ks<br/>science.ks"]
 
-    Launch --> rlseq1["rlseq.ks (quick or prompted)"]
-    Launch --> ssto1["ssto.ks (quick or prompted)"]
-    Launch --> launchwindow1["launchwindow.ks"]
-    Launch --> plane_launch1["plane_launch.ks"]
-    Launch --> science1["science.ks"]
-
-    Surface --> hop1["hop.ks"]
-    Surface --> science2["science.ks"]
-    Surface --> rlseq2["rlseq.ks"]
-    Surface --> launchwindow2["launchwindow.ks"]
-    Surface --> basedock["basedock.ks"]
-    Surface --> rove["rove.ks"]
-    Surface --> hover["hover.ks"]
-
-    Space --> Maneuver["Maneuver planning..."]
-    Space --> node["node.ks (execute next node)"]
-    Space --> Prox["Proximity ops..."]
-    Space --> Land["Land..."]
-    Space --> science3["science.ks"]
-    Space --> timewarp["timewarp.ks"]
-
-    Maneuver --> hohmann["hohmann.ks"]
-    Maneuver --> interplanet["interplanet.ks"]
-    Maneuver --> matchplanes["matchplanes.ks"]
-    Maneuver --> capture["capture.ks"]
-    Maneuver --> circat["circat.ks + node.ks (circularize)"]
-    Maneuver --> node_tune["node_tune.ks"]
-    Maneuver --> change_alt["change_alt.ks"]
-    Maneuver --> planeland1["planeland.ks (deorbit + autoland)"]
-
-    Prox --> rendezvous["rendezvous.ks"]
-    Prox --> dock["dock.ks"]
-    Prox --> grapple["grapple.ks"]
-    Prox --> transfer_fuel["transfer_fuel.ks"]
-
-    Land --> landat["landat.ks"]
-    Land --> hop2["hop.ks"]
-
-    Air --> planeland2["planeland.ks"]
-    Air --> plane_launch2["plane_launch.ks"]
-    Air --> science4["science.ks"]
+    Space --> Maneuver["<b>Plan a maneuver</b><br/>hohmann.ks<br/>interplanet.ks<br/>matchplanes.ks<br/>capture.ks<br/>circat.ks + node.ks<br/>node_tune.ks<br/>change_alt.ks<br/>planeland.ks"]
+    Space --> Prox["<b>Proximity ops</b><br/>rendezvous.ks<br/>dock.ks<br/>grapple.ks<br/>transfer_fuel.ks"]
+    Space --> Land["<b>Land</b><br/>landat.ks<br/>hop.ks"]
+    Space --> Other["node.ks (execute node)<br/>science.ks (sweep)<br/>timewarp.ks (warp to...)"]
 ```
 
 ### Menu options by situation
