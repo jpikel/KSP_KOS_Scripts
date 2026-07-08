@@ -1,0 +1,9 @@
+date,ship,body,ap_km,pe_km,inc_deg,dv_to_orbit,elapsed_s,liftoff_twr,max_twr
+Y10 D88 00:39:34,Gillyflower Station,Kerbin,103.1,58.6,0.28,3213,310,1.45,2.2
+Y10 D88 00:39:01,Gillyflower Station,Kerbin,81.9,78.1,0.11,3217,305,1.45,2.2
+Y12 D367 00:58:12,Tanker,Kerbin,80.5,80.3,0.19,3278,316,1.45,2.2
+Y16 D276 01:11:20,SSTO 1,Kerbin,80.3,80.3,0.05,-914,710,0,0
+Y16 D276 01:09:20,SSTO 1,Kerbin,80,-94.2,0.08,-4,541,0,0
+Y16 D276 01:09:05,SSTO 1,Kerbin,80,-165.1,0.06,0,528,0,0
+Y16 D276 01:10:12,SSTO 1,Kerbin,80,79.7,0.05,-546,588,0,0
+Y16 D276 01:12:35,SSTO 1,Kerbin,79.7,79.1,0.05,-574,715,0,0

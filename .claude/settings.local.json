@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell($src = \"D:\\\\SteamLibrary\\\\steamapps\\\\common\\\\Kerbal Space Program\\\\Ships\\\\VAB\\\\Gillyflower Station.craft\"; $dstDir = \"D:\\\\SteamLibrary\\\\steamapps\\\\common\\\\Kerbal Space Program\\\\saves\\\\KSP\\\\Ships\\\\VAB\"; if \\(-not \\(Test-Path $dstDir\\)\\) { New-Item -ItemType Directory -Force $dstDir | Out-Null }; Copy-Item $src $dstDir -Force; Get-ChildItem $dstDir | Select-Object Name, Length, LastWriteTime)",
+      "PowerShell($log = \"D:\\\\SteamLibrary\\\\steamapps\\\\common\\\\Kerbal Space Program\\\\KSP.log\"; if \\(Test-Path $log\\) { Write-Output \\(\"log modified: \" + \\(Get-Item $log\\).LastWriteTime\\); Select-String -Path $log -Pattern 'Gillyflower' -Context 0,4 | Select-Object -First 10 | ForEach-Object { $_.Line; $_.Context.PostContext } } else { Write-Output \"no KSP.log found\" })",
+      "PowerShell(Copy-Item \"D:\\\\SteamLibrary\\\\steamapps\\\\common\\\\Kerbal Space Program\\\\Ships\\\\Script\\\\plane_launch.ks\" \"D:\\\\SteamLibrary\\\\steamapps\\\\common\\\\Kerbal Space Program\\\\Ships\\\\Script\\\\plane_launch_old.ks\")",
+      "PowerShell(\\(Get-Item \"D:\\\\SteamLibrary\\\\steamapps\\\\common\\\\Kerbal Space Program\\\\Ships\\\\Script\\\\petal.ks\"\\).Length)",
+      "mcp__visualize__read_me",
+      "mcp__visualize__show_widget"
+    ]
+  }
+}
