@@ -1,23 +1,115 @@
 # KSP_KOS_Scripts
-Kerbal Operating System Scripts
 
-Some of the scripts that I have been working on for Kerbal Operating System mod for Kerbal Space Program
+Scripts for the [Kerbal Operating System (kOS)](https://ksp-kos.github.io/KOS/) mod for Kerbal Space Program.
 
-A lot of these are works in progress and I have tried my best to make references
+A lot of these are works in progress. Comments are sparse, but most scripts are fairly short and named for what they do.
 
-My comments are lacking, but most of the scripts are fairly short at the moment.
+## Start here: `fc.ks`
+
+`fc.ks` ("KAL 9000") is the flight-computer front end for the whole suite. Run it once per flight —
+
+```kerboscript
+run fc.
+```
+
+— and it stays in a loop: it prints a status block (situation, orbit/position, target, delta-v, next node), then shows a menu built from the ship's current `ship:status`. Picking an option dispatches to the specialist script for that job (which may prompt for its own parameters), then returns you to the menu when it's done. You never have to remember which script to run — `fc.ks` figures it out from the ship's current state.
+
+```mermaid
+flowchart TD
+    Start(["run fc."]) --> Status{"ship:status"}
+
+    Status -->|"PRELAUNCH, or LANDED at Kerbin"| Launch["Launch menu"]
+    Status -->|"LANDED / SPLASHED elsewhere"| Surface["Surface menu"]
+    Status -->|"ORBITING / ESCAPING / SUB_ORBITAL"| Space["Space menu"]
+    Status -->|"FLYING (in atmosphere)"| Air["Air menu"]
+
+    Launch --> rlseq1["rlseq.ks (quick or prompted)"]
+    Launch --> ssto1["ssto.ks (quick or prompted)"]
+    Launch --> launchwindow1["launchwindow.ks"]
+    Launch --> plane_launch1["plane_launch.ks"]
+    Launch --> science1["science.ks"]
+
+    Surface --> hop1["hop.ks"]
+    Surface --> science2["science.ks"]
+    Surface --> rlseq2["rlseq.ks"]
+    Surface --> launchwindow2["launchwindow.ks"]
+    Surface --> basedock["basedock.ks"]
+    Surface --> rove["rove.ks"]
+    Surface --> hover["hover.ks"]
+
+    Space --> Maneuver["Maneuver planning..."]
+    Space --> node["node.ks (execute next node)"]
+    Space --> Prox["Proximity ops..."]
+    Space --> Land["Land..."]
+    Space --> science3["science.ks"]
+    Space --> timewarp["timewarp.ks"]
+
+    Maneuver --> hohmann["hohmann.ks"]
+    Maneuver --> interplanet["interplanet.ks"]
+    Maneuver --> matchplanes["matchplanes.ks"]
+    Maneuver --> capture["capture.ks"]
+    Maneuver --> circat["circat.ks + node.ks (circularize)"]
+    Maneuver --> node_tune["node_tune.ks"]
+    Maneuver --> change_alt["change_alt.ks"]
+    Maneuver --> planeland1["planeland.ks (deorbit + autoland)"]
+
+    Prox --> rendezvous["rendezvous.ks"]
+    Prox --> dock["dock.ks"]
+    Prox --> grapple["grapple.ks"]
+    Prox --> transfer_fuel["transfer_fuel.ks"]
+
+    Land --> landat["landat.ks"]
+    Land --> hop2["hop.ks"]
+
+    Air --> planeland2["planeland.ks"]
+    Air --> plane_launch2["plane_launch.ks"]
+    Air --> science4["science.ks"]
+```
+
+### Menu options by situation
+
+**Prelaunch, or landed at Kerbin** — launch menu:
+- QUICK rocket launch / QUICK SSTO launch — `rlseq.ks` / `ssto.ks` with sane defaults, no prompts
+- Rocket launch with prompts — `rlseq.ks`
+- SSTO launch with prompts — `ssto.ks`
+- Timed launch to meet a target — `launchwindow.ks`
+- Plane takeoff + cruise — `plane_launch.ks`
+- Science sweep — `science.ks`
+
+**Landed or splashed elsewhere** — surface menu:
+- Hop to another site — `hop.ks`
+- Science sweep — `science.ks`
+- Ascend to orbit — `rlseq.ks`
+- Timed launch to meet a target — `launchwindow.ks`
+- Hover-dock with a base port — `basedock.ks`
+- Rover cruise / drive to waypoint — `rove.ks`
+- Hover (altitude hold) — `hover.ks`
+
+**Orbiting, escaping, or sub-orbital** — space menu:
+- Plan a maneuver → **maneuver planning submenu**: `hohmann.ks`, `interplanet.ks`, `matchplanes.ks`, `capture.ks`, circularize (`circat.ks` + `node.ks`), `node_tune.ks`, `change_alt.ks`, `planeland.ks` (spaceplane deorbit)
+- Execute next node — `node.ks`
+- Proximity ops → **submenu**: `rendezvous.ks`, `dock.ks`, `grapple.ks`, `transfer_fuel.ks`
+- Land → **submenu**: `landat.ks` (next to a base), `hop.ks` (under current position)
+- Science sweep — `science.ks`
+- Warp to... — `timewarp.ks`
+
+**Flying in atmosphere** — air menu:
+- Autoland at KSC runway — `planeland.ks`
+- Cruise autopilot — `plane_launch.ks`
+- Science sweep — `science.ks`
 
 ## Repository layout
 
-- Top-level `.ks` files — active scripts for launch, docking, rendezvous, orbital maneuvers, science, SSTOs, rovers, and general flight control
+- Top-level `.ks` files — the active scripts listed above, plus flight-control utilities (`antenna.ks`, `deploy_fairings.ks`, `status.ks`, `incseq.ks`, etc.)
 - `lib_*.ks` — shared libraries (orbit math, Lambert solver, staging, input handling, UI, physics)
 - `boot/` — boot scripts loaded on vessel startup
 - `attic/` — deprecated or superseded scripts kept for reference
 - `*_log.csv` — flight/mission logs written by the corresponding scripts
+- `docs/kos/` — offline mirror of the [kOS documentation](https://ksp-kos.github.io/KOS/) for local reference; see [docs/kos/README.md](docs/kos/README.md)
 
 ## Notes
 
-- This repo was reorganized to use `main` as the default branch
+- This repo uses `main` as the default branch
 
 ## Script reference
 
